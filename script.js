@@ -94,7 +94,7 @@
             const { TEXT, AVAILABLE } = args;
             const item = this.dropdownList.find(item => item.text === TEXT);
             if (item) {
-                item.available = AVAILABLE;
+                item.available = AVAILABLE === true;
             } else {
                 alert(`L'élément "${TEXT}" n'existe pas dans la liste.`);
             }
@@ -120,14 +120,18 @@
                 ctx.fillText(item.text, x + 10, y + (index + 1) * itemHeight - 10);
 
                 // Détecter le clic sur une option
-                const mouseX = Scratch.vm.runtime.ioDevices.mouse.x;
-                const mouseY = Scratch.vm.runtime.ioDevices.mouse.y;
-                const clicked = Scratch.vm.runtime.ioDevices.mouse.buttonsPressed.includes('left');
+                const mouseX = Scratch.vm.runtime.ioDevices.mouse._scratchX;
+                const mouseY = Scratch.vm.runtime.ioDevices.mouse._scratchY;
+                const clicked = Scratch.vm.runtime.ioDevices.mouse.buttonsPressed.left;
+
+                const itemTop = y + index * itemHeight;
+                const itemBottom = itemTop + itemHeight;
 
                 if (clicked && mouseX >= x && mouseX <= x + width &&
-                    mouseY >= y + index * itemHeight && mouseY <= y + (index + 1) * itemHeight) {
+                    mouseY >= itemTop && mouseY <= itemBottom) {
                     this.selectedItem = item;
                     this.hideDropdown(); // Masquer la liste après la sélection
+                    Scratch.vm.runtime.requestRedraw();
                 }
             });
         }
