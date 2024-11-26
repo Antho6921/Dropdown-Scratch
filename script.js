@@ -113,11 +113,22 @@
             ctx.fillRect(x, y, width, visibleItems.length * itemHeight);
             ctx.strokeRect(x, y, width, visibleItems.length * itemHeight);
 
-            // Dessiner chaque option
+            // Dessiner chaque option avec interaction
             ctx.fillStyle = 'black';
             ctx.font = '16px Arial';
             visibleItems.forEach((item, index) => {
                 ctx.fillText(item.text, x + 10, y + (index + 1) * itemHeight - 10);
+
+                // Détecter le clic sur une option
+                const mouseX = Scratch.vm.runtime.ioDevices.mouse.x;
+                const mouseY = Scratch.vm.runtime.ioDevices.mouse.y;
+                const clicked = Scratch.vm.runtime.ioDevices.mouse.buttonsPressed.includes('left');
+
+                if (clicked && mouseX >= x && mouseX <= x + width &&
+                    mouseY >= y + index * itemHeight && mouseY <= y + (index + 1) * itemHeight) {
+                    this.selectedItem = item;
+                    this.hideDropdown(); // Masquer la liste après la sélection
+                }
             });
         }
     }
