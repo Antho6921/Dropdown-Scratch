@@ -7,6 +7,7 @@
             // Liste initiale
             this.dropdownList = [];
             this.selectedItem = null;
+            this.dropdownVisible = false; // État de visibilité du menu déroulant
         }
 
         getInfo() {
@@ -33,6 +34,11 @@
                         opcode: 'showDropdown',
                         blockType: Scratch.BlockType.COMMAND,
                         text: 'afficher la liste déroulante',
+                    },
+                    {
+                        opcode: 'hideDropdown',
+                        blockType: Scratch.BlockType.COMMAND,
+                        text: 'cacher la liste déroulante',
                     },
                     {
                         opcode: 'getSelectedItem',
@@ -71,15 +77,13 @@
                 return;
             }
 
-            const itemNames = availableItems.map(item => item.text);
-            const selected = prompt('Sélectionnez un élément :\n' + itemNames.join('\n'));
+            this.dropdownVisible = true;
+            Scratch.vm.runtime.requestRedraw(); // Demande une redessine de la scène
+        }
 
-            const selectedItem = availableItems.find(item => item.text === selected);
-            if (selectedItem) {
-                this.selectedItem = selectedItem;
-            } else {
-                alert('Élément non valide ou non disponible');
-            }
+        hideDropdown() {
+            this.dropdownVisible = false;
+            Scratch.vm.runtime.requestRedraw(); // Demande une redessine de la scène
         }
 
         getSelectedItem() {
@@ -94,6 +98,27 @@
             } else {
                 alert(`L'élément "${TEXT}" n'existe pas dans la liste.`);
             }
+        }
+
+        draw(ctx) {
+            if (!this.dropdownVisible) return;
+
+            const x = 10, y = 10, width = 200, itemHeight = 30;
+            const visibleItems = this.dropdownList.filter(item => item.available);
+
+            // Dessiner le fond du menu déroulant
+            ctx.fillStyle = 'white';
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.fillRect(x, y, width, visibleItems.length * itemHeight);
+            ctx.strokeRect(x, y, width, visibleItems.length * itemHeight);
+
+            // Dessiner chaque option
+            ctx.fillStyle = 'black';
+            ctx.font = '16px Arial';
+            visibleItems.forEach((item, index) => {
+                ctx.fillText(item.text, x + 10, y + (index + 1) * itemHeight - 10);
+            });
         }
     }
 
